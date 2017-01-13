@@ -1,6 +1,6 @@
 package com.silimstudy.study;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -12,7 +12,7 @@ import javax.persistence.Id;
  * Created by yeomyeongwoo on 2017. 1. 6..
  */
 @Entity
-@Getter
+@Data
 @NoArgsConstructor
 public class Study {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
