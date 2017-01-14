@@ -1,5 +1,6 @@
-package com.silimstudy.auth;
+package com.silimstudy.auth.request;
 
+import com.silimstudy.auth.request.JoinRequest;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;

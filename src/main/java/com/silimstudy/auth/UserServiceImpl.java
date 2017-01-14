@@ -1,5 +1,6 @@
 package com.silimstudy.auth;
 
+import com.silimstudy.auth.request.JoinRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

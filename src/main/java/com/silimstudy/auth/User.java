@@ -32,6 +32,10 @@ public class User implements UserDetails{
         this.username = username;
         this.password = password;
         this.email = email;
+        this.isAccountNonExpired = true;
+        this.isAccountNonLocked = true;
+        this.isCredentialsNonExpired = true;
+        this.isEnabled = true;
     }
 
 

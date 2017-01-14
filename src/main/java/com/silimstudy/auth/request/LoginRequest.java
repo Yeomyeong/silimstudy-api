@@ -1,4 +1,4 @@
-package com.silimstudy.auth;
+package com.silimstudy.auth.request;
 
 import lombok.Data;
 
