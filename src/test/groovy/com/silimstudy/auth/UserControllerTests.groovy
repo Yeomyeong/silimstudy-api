@@ -1,38 +1,72 @@
 package com.silimstudy.auth
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 /**
  * Created by yeomyeongwoo on 2017. 1. 14..
  */
 class UserControllerTests extends Specification {
-    @Autowired private WebApplicationContext context
-    private MockMvc mockMvc
+    /*
+    @Shared
+    @AutoCleanup
+    ConfigurableApplicationContext context
 
-    void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build()
+    void setupSpec() {
+        Future future = Executors
+                .newSingleThreadExecutor().submit(
+                new Callable() {
+                    @Override
+                    ConfigurableApplicationContext call() throws Exception {
+                        return (ConfigurableApplicationContext) SpringApplication
+                                .run(SilimstudyApiApplication.class)
+                    }
+                })
+        context = (ConfigurableApplicationContext) future.get(60, TimeUnit.SECONDS)
+    }
+    */
 
+    void "HTTP GET 으로 회원 가입 요청 불가"() {
+        when:
+        def ex = null
+        try {
+            new RestTemplate()
+                    .getForEntity("http://localhost:8080/user/join", String.class)
+        } catch (Exception e){
+            ex = e
+        }
+
+        then:
+        ex.class == HttpClientErrorException.class
+        ex.message.contains('405')
+        System.out.println(ex.message)
     }
 
-    def "아이디 패스워드 기입 하지 않고 로그인 시도 테스트 "() {
-        given :
-        def username = ""
-        def password = ""
+    void "ID, password 기입하지 않고 HTTP POST 로  회원 가입 요청 불가"() {
+        when:
+        def entity = new RestTemplate()
+                    .postForEntity("http://localhost:8080/user/join", "", String.class)
 
-        when :
-        def response = this.mockMvc.perform(get("/study/list")
-                .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
 
-        then :
-        response.andDo(print())
-                .andExpect(status().isOk())
+        then:
+        entity.statusCode == HttpStatus.OK
+        entity.body == 'fail'
+    }
+
+    void "should reverse request!"() {
+        when:
+        ResponseEntity<String> entity = new RestTemplate().getForEntity(url, String.class)
+
+        then:
+        entity.statusCode == HttpStatus.OK
+        entity.body == reversedString
+
+        where:
+        url                                 || reversedString
+        'http://localhost:8080/reverse/uno' || 'onu'
+        'http://localhost:8080/reverse/ufc' || 'cfu'
     }
 }
