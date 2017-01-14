@@ -19,12 +19,15 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private AuthRepository authRepository;
-
+    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, AuthRepository authRepository) {
+        this.userRepository = userRepository;
+        this.authRepository = authRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -23,10 +23,14 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+
     @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserService userService;
+    public UserController(AuthenticationManager authenticationManager, UserService userService) {
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+    }
 
     @RequestMapping(path = "/login", method= RequestMethod.POST)
     public AuthToken login(LoginRequest request, HttpSession session, Errors errors) {
