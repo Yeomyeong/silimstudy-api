@@ -11,7 +11,6 @@ import java.util.Collection;
  * Created by yeojung on 17. 1. 14.
  */
 public interface UserService extends UserDetailsService{
-    Collection<GrantedAuthority> getAuthorities(String username);
     User readUser(String username);
     void createUser(JoinRequest user);
     void deleteUser(String username);
