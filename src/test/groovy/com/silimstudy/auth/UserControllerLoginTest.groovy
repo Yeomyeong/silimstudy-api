@@ -1,12 +1,10 @@
 package com.silimstudy.auth
 
-import com.jayway.jsonpath.JsonPath
 import com.silimstudy.SilimstudyApiApplication
 import org.springframework.boot.SpringApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpStatus
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import spock.lang.AutoCleanup
 import spock.lang.Shared
@@ -18,12 +16,9 @@ import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 import static com.TestUtils.log
-import static com.jayway.jsonassert.JsonAssert.*
+import static com.jayway.jsonassert.JsonAssert.with
 import static org.hamcrest.Matchers.*
 
-/**
- * Created by yeojung on 17. 1. 15.
- */
 class UserControllerLoginTest extends Specification {
     private final String JOIN_URI = "http://localhost:8080/user/join"
     private final String LOGIN_URI = "http://localhost:8080/user/login"

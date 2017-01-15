@@ -7,9 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
-/**
- * Created by yeojung on 17. 1. 14.
- */
 @Entity
 @Data
 @NoArgsConstructor
