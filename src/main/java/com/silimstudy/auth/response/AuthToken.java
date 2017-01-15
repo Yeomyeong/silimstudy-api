@@ -12,15 +12,35 @@ import java.util.Collection;
 @Getter
 @AllArgsConstructor
 public class AuthToken {
-    private static AuthToken nonetoken = new AuthToken();
+    private static final AuthToken notMatchedToken = new AuthToken(LoginResponse.NOT_MATCHED);
+    private static final AuthToken notValidToken = new AuthToken(LoginResponse.NOT_VALID);
 
     private String username;
     private Collection<Authority> authorities;
     private String token;
+    private LoginResponse response;
 
-    private AuthToken(){}
+    private AuthToken(LoginResponse response){
+        this.response = response;
+    }
 
-    public static AuthToken none() {
-        return nonetoken;
+    public static AuthToken notMatchedToken() {
+        return notMatchedToken;
+    }
+
+    public static AuthToken notValidToken() {
+        return notValidToken;
+    }
+
+    public static AuthToken successToken(String username, Collection<Authority> authorities, String token) {
+        AuthToken that = new AuthToken(LoginResponse.SUCCESS);
+        that.username = username;
+        that.authorities = authorities;
+        that.token = token;
+        return that;
+    }
+
+    public enum LoginResponse{
+        SUCCESS, NOT_MATCHED, NOT_VALID
     }
 }

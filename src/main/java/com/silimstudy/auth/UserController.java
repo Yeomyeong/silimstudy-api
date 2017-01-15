@@ -51,11 +51,11 @@ public class UserController {
     public AuthToken login(LoginRequest request, HttpSession session, Errors errors) {
         new LoginRequestValidator().validate(request, errors);
         if (errors.hasErrors())
-            return AuthToken.none();
+            return AuthToken.notValidToken();
 
         User user = userService.readUser(request.getUsername());
-        if (!userService.passwordEncoder().matches(request.getPassword(), user.getPassword()))
-             return AuthToken.none();
+        if ( user == null || !userService.passwordEncoder().matches(request.getPassword(), user.getPassword()))
+             return AuthToken.notMatchedToken();
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
@@ -64,7 +64,7 @@ public class UserController {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
 
-        return new AuthToken(user.getUsername(), user.getAuthorities(), session.getId());
+        return AuthToken.successToken(user.getUsername(), user.getAuthorities(), session.getId());
     }
 
     //TODO 회원 탈퇴 기능
