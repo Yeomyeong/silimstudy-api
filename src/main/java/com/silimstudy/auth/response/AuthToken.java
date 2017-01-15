@@ -1,5 +1,6 @@
-package com.silimstudy.auth;
+package com.silimstudy.auth.response;
 
+import com.silimstudy.auth.Authority;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

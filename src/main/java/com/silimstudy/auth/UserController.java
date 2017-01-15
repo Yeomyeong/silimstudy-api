@@ -4,6 +4,8 @@ import com.silimstudy.auth.request.JoinRequest;
 import com.silimstudy.auth.request.JoinRequestValidator;
 import com.silimstudy.auth.request.LoginRequest;
 import com.silimstudy.auth.request.LoginRequestValidator;
+import com.silimstudy.auth.response.AuthToken;
+import com.silimstudy.auth.response.JoinResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +34,19 @@ public class UserController {
         this.userService = userService;
     }
 
+    @RequestMapping(path = "/join", method= RequestMethod.POST)
+    public JoinResponse join(JoinRequest request, Errors errors) {
+        new JoinRequestValidator().validate(request, errors);
+        if (errors.hasErrors())
+            return JoinResponse.NOT_VALID;
+        try {
+            userService.createUser(request);
+            return JoinResponse.SUCCESS;
+        } catch (AlreadyExistingUserException e) {
+            return JoinResponse.ALREADY_EXIST;
+        }
+    }
+
     @RequestMapping(path = "/login", method= RequestMethod.POST)
     public AuthToken login(LoginRequest request, HttpSession session, Errors errors) {
         new LoginRequestValidator().validate(request, errors);
@@ -52,17 +67,8 @@ public class UserController {
         return new AuthToken(user.getUsername(), user.getAuthorities(), session.getId());
     }
 
-    @RequestMapping(path = "/join", method= RequestMethod.POST)
-    public String join(JoinRequest request, Errors errors) {
-        new JoinRequestValidator().validate(request, errors);
-        if (errors.hasErrors())
-            return "fail";
-        try {
-            userService.createUser(request);
-            return "success";
-        } catch (AlreadyExistingUserException e) {
-            errors.rejectValue("username", "duplicated");
-            return "fail";
-        }
-    }
+    //TODO 회원 탈퇴 기능
+
+    //TODO 회원 정보 수정 기능
+
 }
