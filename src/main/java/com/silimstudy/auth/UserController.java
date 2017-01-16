@@ -67,6 +67,12 @@ public class UserController {
         return AuthToken.successToken(user.getUsername(), user.getAuthorities(), session.getId());
     }
 
+    @RequestMapping(path = "/logout", method= RequestMethod.POST)
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "SUCCESS";
+    }
+
     //TODO 회원 탈퇴 기능
 
     //TODO 회원 정보 수정 기능
