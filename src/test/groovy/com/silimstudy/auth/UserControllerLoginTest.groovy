@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.*
 class UserControllerLoginTest extends Specification {
     private final String JOIN_URI = "http://localhost:8080/user/join"
     private final String LOGIN_URI = "http://localhost:8080/user/login"
+    private final String LOGOUT_URI = "http://localhost:8080/user/logout"
     private String TEST_ID = "aaaa"
     private String TEST_PASSWORD = "1234"
     private String TEST_EMAIL = "aaaa@silimstudy.net"
@@ -112,5 +113,26 @@ class UserControllerLoginTest extends Specification {
                 .assertThat('$.username', isEmptyOrNullString())
                 .assertThat('$.authorities', isEmptyOrNullString())
                 .assertThat('$.token', isEmptyOrNullString())
+    }
+
+    void "로그인 하고 나서 로그아웃 하기"() {
+        given:
+        def loginParam = new LinkedMultiValueMap<String, String>()
+        loginParam.add("username", TEST_ID)
+        loginParam.add("password", TEST_PASSWORD)
+        def restTemplate = new RestTemplate()
+        when:
+        def loginEntity = restTemplate.postForEntity(LOGIN_URI, loginParam, String.class)
+        loginEntity.statusCode == HttpStatus.OK
+        with(loginEntity.body)
+                .assertThat('$.response', is('SUCCESS'))
+                .assertThat('$.username', is(TEST_ID))
+                .assertThat('$.authorities[0].authority', is('USER'))
+                .assertThat('$.token', not(isEmptyString()))
+        log(loginEntity.getHeaders().get('Cookie'))
+        def logoutEntity = restTemplate.getForEntity(LOGOUT_URI, String.class)
+        then:
+        logoutEntity.statusCode == HttpStatus.OK
+
     }
 }

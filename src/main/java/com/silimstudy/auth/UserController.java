@@ -6,25 +6,27 @@ import com.silimstudy.auth.request.LoginRequest;
 import com.silimstudy.auth.request.LoginRequestValidator;
 import com.silimstudy.auth.response.AuthToken;
 import com.silimstudy.auth.response.JoinResponse;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- * Created by yeojung on 17. 1. 14.
- */
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
@@ -47,7 +49,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = "/login", method= RequestMethod.POST)
+    @RequestMapping(path = "/login", method=RequestMethod.POST)
     public AuthToken login(LoginRequest request, HttpSession session, Errors errors) {
         new LoginRequestValidator().validate(request, errors);
         if (errors.hasErrors())
@@ -67,10 +69,16 @@ public class UserController {
         return AuthToken.successToken(user.getUsername(), user.getAuthorities(), session.getId());
     }
 
-    @RequestMapping(path = "/logout", method= RequestMethod.POST)
-    public String logout(HttpSession session) {
+    @RequestMapping(path = "/logout", method=RequestMethod.GET)
+    public void logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         session.invalidate();
-        return "SUCCESS";
+        String returnUrl = request.getParameter("returnUrl");
+        try {
+            if (!StringUtils.isEmpty(returnUrl))
+                response.sendRedirect(returnUrl);
+        } catch (Exception e) {
+            LogFactory.getLog(this.getClass()).error(e.getMessage(), e);
+        }
     }
 
     //TODO 회원 탈퇴 기능
