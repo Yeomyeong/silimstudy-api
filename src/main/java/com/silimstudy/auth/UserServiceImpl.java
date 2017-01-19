@@ -8,9 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by yeojung on 17. 1. 14.
- */
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;

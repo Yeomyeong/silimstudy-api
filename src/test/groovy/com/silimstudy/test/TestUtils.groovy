@@ -1,4 +1,4 @@
-package com
+package com.silimstudy.test
 
 /**
  * Created by yeojung on 17. 1. 15.

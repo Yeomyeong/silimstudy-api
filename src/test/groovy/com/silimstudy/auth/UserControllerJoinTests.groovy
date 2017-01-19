@@ -16,7 +16,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
-import static com.TestUtils.log
+import static com.silimstudy.test.TestUtils.log
 
 /**
  * Created by yeomyeongwoo on 2017. 1. 14..

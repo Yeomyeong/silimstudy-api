@@ -3,6 +3,9 @@ package com.silimstudy.auth
 import com.silimstudy.SilimstudyApiApplication
 import org.springframework.boot.SpringApplication
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
@@ -15,7 +18,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
-import static com.TestUtils.log
+import static com.silimstudy.test.TestUtils.log
 import static com.jayway.jsonassert.JsonAssert.with
 import static org.hamcrest.Matchers.*
 
@@ -123,16 +126,24 @@ class UserControllerLoginTest extends Specification {
         def restTemplate = new RestTemplate()
         when:
         def loginEntity = restTemplate.postForEntity(LOGIN_URI, loginParam, String.class)
+        def cookies = loginEntity.getHeaders().get("Set-Cookie")
+        log('Set-Cookie)'+ cookies)
         loginEntity.statusCode == HttpStatus.OK
         with(loginEntity.body)
                 .assertThat('$.response', is('SUCCESS'))
                 .assertThat('$.username', is(TEST_ID))
                 .assertThat('$.authorities[0].authority', is('USER'))
                 .assertThat('$.token', not(isEmptyString()))
-        log(loginEntity.getHeaders().get('Cookie'))
-        def logoutEntity = restTemplate.getForEntity(LOGOUT_URI, String.class)
+
+        HttpHeaders headers = new HttpHeaders()
+        headers.set("Cookie", cookies.join(';'))
+        HttpEntity<String> entity = new HttpEntity<String>(headers)
+        def logoutEntity = restTemplate.exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
+        def logoutAgainEntity = restTemplate.exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
+
         then:
         logoutEntity.statusCode == HttpStatus.OK
+        logoutAgainEntity.statusCode == HttpStatus.UNAUTHORIZED
 
     }
 }
