@@ -17,12 +17,13 @@ import javax.persistence.Id;
 public class Study {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
+    private long userId;
     private String title;
-    private String content;
+    private String contents;
 
-    public Study(String title, String content) {
+    public Study(String title, String contents, long userId) {
+        this.userId = userId;
         this.title = title;
-        this.content = content;
+        this.contents = contents;
     }
 }

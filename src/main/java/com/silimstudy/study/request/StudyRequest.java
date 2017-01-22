@@ -1,4 +1,4 @@
-package com.silimstudy.study;
+package com.silimstudy.study.request;
 
 import lombok.Data;
 import lombok.ToString;
@@ -8,7 +8,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class StudyRegisterRequest {
+public class StudyRequest {
     private String title;
     private String contents;
 }

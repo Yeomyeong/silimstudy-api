@@ -1,5 +1,7 @@
 package com.silimstudy.study;
 
+import com.silimstudy.auth.User;
+import com.silimstudy.study.request.StudyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,14 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public void register(StudyRegisterRequest request) {
-        studyRepository.save(new Study(request.getTitle(), request.getContents()));
+    public List<Study> search(long userId) {
+        return studyRepository.findByUserId(userId);
     }
+
+    @Override
+    public void register(User user, StudyRequest request) {
+        studyRepository.save(new Study(request.getTitle(), request.getContents(), user.getId()));
+    }
+
+
 }
