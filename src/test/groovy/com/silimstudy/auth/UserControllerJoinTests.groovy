@@ -2,6 +2,7 @@ package com.silimstudy.auth
 
 import com.silimstudy.SilimstudyApiApplication
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpStatus
 import org.springframework.util.LinkedMultiValueMap
@@ -18,9 +19,7 @@ import java.util.concurrent.TimeUnit
 
 import static com.silimstudy.test.TestUtils.log
 
-/**
- * Created by yeomyeongwoo on 2017. 1. 14..
- */
+@SpringBootTest
 class UserControllerJoinTests extends Specification {
     private final String URI = "http://localhost:8080/user/join"
 
@@ -42,19 +41,13 @@ class UserControllerJoinTests extends Specification {
     }
 
     void "HTTP GET 으로 회원 가입 요청 불가"() {
-        when:
-        def ex = null
-        try {
-            new RestTemplate()
-                    .getForEntity(URI, String.class)
-        } catch (Exception e){
-            ex = e
-        }
+        when :
+        def param = "username=aaa&password=aaaa&email=aaa@naver.net"
+        new RestTemplate().getForEntity(URI + "?" + param, String.class)
 
         then:
-        ex.class == HttpClientErrorException.class
-        ex.message.contains('405')
-        log(ex.message)
+        def e = thrown(HttpClientErrorException.class)
+        e.message == '401 null'
     }
 
     void "아무것도 기입하지 않고 HTTP POST 로  회원 가입 요청 불가"() {

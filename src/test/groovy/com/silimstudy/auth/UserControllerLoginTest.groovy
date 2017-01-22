@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import spock.lang.AutoCleanup
 import spock.lang.Shared
@@ -119,31 +120,32 @@ class UserControllerLoginTest extends Specification {
     }
 
     void "로그인 하고 나서 로그아웃 하기"() {
-        given:
+        setup: "로그인 하기"
         def loginParam = new LinkedMultiValueMap<String, String>()
         loginParam.add("username", TEST_ID)
         loginParam.add("password", TEST_PASSWORD)
-        def restTemplate = new RestTemplate()
-        when:
-        def loginEntity = restTemplate.postForEntity(LOGIN_URI, loginParam, String.class)
-        def cookies = loginEntity.getHeaders().get("Set-Cookie")
-        log('Set-Cookie)'+ cookies)
-        loginEntity.statusCode == HttpStatus.OK
-        with(loginEntity.body)
-                .assertThat('$.response', is('SUCCESS'))
-                .assertThat('$.username', is(TEST_ID))
-                .assertThat('$.authorities[0].authority', is('USER'))
-                .assertThat('$.token', not(isEmptyString()))
+        def loginEntity = new RestTemplate().postForEntity(LOGIN_URI, loginParam, String.class)
 
+        and: "로그인한 세션을 유지하도록 세션 쿠키를 저장"
+        def rowCookies = loginEntity.getHeaders().get("Set-Cookie")
+        log('Set-Cookie)'+ rowCookies)
+        def cookies = rowCookies.join(';')
         HttpHeaders headers = new HttpHeaders()
-        headers.set("Cookie", cookies.join(';'))
+        headers.set("Cookie", cookies)
         HttpEntity<String> entity = new HttpEntity<String>(headers)
-        def logoutEntity = restTemplate.exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
-        def logoutAgainEntity = restTemplate.exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
+
+        when: "같은 세션의 로그아웃 요청"
+        def logoutEntity = new RestTemplate().exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
 
         then:
         logoutEntity.statusCode == HttpStatus.OK
-        logoutAgainEntity.statusCode == HttpStatus.UNAUTHORIZED
+
+        when : "같은 세션의 로그아웃 요청 한번 더"
+        new RestTemplate().exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
+
+        then :
+        def e = thrown(HttpClientErrorException.class)
+        e.message == '401 null'
 
     }
 }
