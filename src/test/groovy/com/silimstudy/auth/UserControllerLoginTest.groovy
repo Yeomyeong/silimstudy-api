@@ -1,6 +1,8 @@
 package com.silimstudy.auth
 
 import com.silimstudy.SilimstudyApiApplication
+import com.silimstudy.test.SimpleParam
+import com.silimstudy.test.SimpleRest
 import org.springframework.boot.SpringApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpEntity
@@ -49,25 +51,20 @@ class UserControllerLoginTest extends Specification {
     }
 
     void setup() {
-        //회원 가입하기
-        def joinParam = new LinkedMultiValueMap<String, String>()
-        joinParam.add("username", TEST_ID)
-        joinParam.add("password", TEST_PASSWORD)
-        joinParam.add("email", TEST_EMAIL)
-        new RestTemplate()
-                .postForEntity(JOIN_URI, joinParam, String.class)
+        new SimpleRest()
+                .post(JOIN_URI, new SimpleParam()
+                    .add("username", TEST_ID)
+                    .add("password", TEST_PASSWORD)
+                    .add("email", TEST_EMAIL))
 
     }
 
     void "로그인 하기"() {
-        given:
-        def loginParam = new LinkedMultiValueMap<String, String>()
-        loginParam.add("username", TEST_ID)
-        loginParam.add("password", TEST_PASSWORD)
-
         when:
-        def entity = new RestTemplate()
-                    .postForEntity(LOGIN_URI, loginParam, String.class)
+        def entity = new SimpleRest()
+                .post(LOGIN_URI, new SimpleParam()
+                    .add("username", TEST_ID)
+                    .add("password", TEST_PASSWORD))
 
         then:
         log(entity.body)
@@ -80,14 +77,11 @@ class UserControllerLoginTest extends Specification {
     }
 
     void "존재하지 않는 username 으로 로그인 요청"() {
-        given:
-        def loginParam = new LinkedMultiValueMap<String, String>()
-        loginParam.add("username", "aaa123123")
-        loginParam.add("password", TEST_PASSWORD)
-
         when:
-        def entity = new RestTemplate()
-                .postForEntity(LOGIN_URI, loginParam, String.class)
+        def entity = new SimpleRest()
+                .post(LOGIN_URI, new SimpleParam()
+                    .add("username", "aaa123123")
+                    .add("password", TEST_PASSWORD))
 
         then:
         log(entity.body)
@@ -100,14 +94,11 @@ class UserControllerLoginTest extends Specification {
     }
 
     void "틀린 패스워드로 로그인 요청"() {
-        given:
-        def loginParam = new LinkedMultiValueMap<String, String>()
-        loginParam.add("username", TEST_ID)
-        loginParam.add("password", '123123123')
-
         when:
-        def entity = new RestTemplate()
-                .postForEntity(LOGIN_URI, loginParam, String.class)
+        def entity = new SimpleRest()
+                .post(LOGIN_URI, new SimpleParam()
+                .add("username", TEST_ID)
+                .add("password", 'nnnn'))
 
         then:
         log(entity.body)
@@ -120,28 +111,21 @@ class UserControllerLoginTest extends Specification {
     }
 
     void "로그인 하고 나서 로그아웃 하기"() {
-        setup: "로그인 하기"
-        def loginParam = new LinkedMultiValueMap<String, String>()
-        loginParam.add("username", TEST_ID)
-        loginParam.add("password", TEST_PASSWORD)
-        def loginEntity = new RestTemplate().postForEntity(LOGIN_URI, loginParam, String.class)
-
-        and: "로그인한 세션을 유지하도록 세션 쿠키를 저장"
-        def rowCookies = loginEntity.getHeaders().get("Set-Cookie")
-        log('Set-Cookie)'+ rowCookies)
-        def cookies = rowCookies.join(';')
-        HttpHeaders headers = new HttpHeaders()
-        headers.set("Cookie", cookies)
-        HttpEntity<String> entity = new HttpEntity<String>(headers)
+        given: "로그인 하기"
+        def loginEntity = new SimpleRest()
+                .post(LOGIN_URI, new SimpleParam()
+                    .add("username", TEST_ID)
+                    .add("password", TEST_PASSWORD))
+        def loginRest = SimpleRest.sameSession(loginEntity)
 
         when: "같은 세션의 로그아웃 요청"
-        def logoutEntity = new RestTemplate().exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
+        def logoutEntity = loginRest.get(LOGOUT_URI)
 
         then:
         logoutEntity.statusCode == HttpStatus.OK
 
         when : "같은 세션의 로그아웃 요청 한번 더"
-        new RestTemplate().exchange(LOGOUT_URI, HttpMethod.GET, entity, String.class)
+        loginRest.get(LOGOUT_URI)
 
         then :
         def e = thrown(HttpClientErrorException.class)
