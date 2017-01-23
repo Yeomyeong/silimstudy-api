@@ -18,6 +18,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
+import static com.jayway.jsonassert.JsonAssert.with
+import static org.hamcrest.Matchers.greaterThan
+
 @SpringBootTest
 class StudyControllerTest extends Specification {
     private final String JOIN_URL = "http://localhost:8080/user/join"
@@ -130,12 +133,22 @@ class StudyControllerTest extends Specification {
                 .add("username", "wym")
                 .add("password", "1234"))
 
+        SimpleRest.sameSession(loginEntity)
+                .post(STUDY_URL, new SimpleParam()
+                .add("title", "OOP study")
+                .add("contents", "객체지향 스터디입니다. 화이팅해요. 여러분~~"))
+        SimpleRest.sameSession(loginEntity)
+                .post(STUDY_URL, new SimpleParam()
+                .add("title", "AI study")
+                .add("contents", "객체지향 스터디입니다. 화이팅해요. 여러분~~"))
+
         when :
         def entity = SimpleRest.sameSession(loginEntity).get(STUDY_LIST_URL)
 
         then :
         entity.statusCode == HttpStatus.OK
-        //TODO 사이즈가 1인지 체크
+        with(entity.body)
+                .assertThat('$.length()', greaterThan(0))
     }
 
 
