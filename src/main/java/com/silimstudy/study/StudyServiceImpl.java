@@ -26,7 +26,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> search(long userId) {
-        return studyRepository.findByUserId(userId);
+        return studyRepository.findByAdminId(userId);
     }
 
     @Override
@@ -34,5 +34,14 @@ public class StudyServiceImpl implements StudyService {
         studyRepository.save(new Study(request.getTitle(), request.getContents(), user.getId()));
     }
 
+    @Override
+    public Study find(long studyId) {
+        return studyRepository.findOne(studyId);
+    }
 
+    @Override
+    public void remove(Study study) {
+        study.setActive(false);
+        studyRepository.save(study);
+    }
 }

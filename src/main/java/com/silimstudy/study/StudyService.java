@@ -12,4 +12,6 @@ public interface StudyService {
     void register(User user, StudyRequest request);
     List<Study> search();
     List<Study> search(long userId);
+    void remove(Study study);
+    Study find(long studyId);
 }

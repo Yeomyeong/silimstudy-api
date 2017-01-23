@@ -4,12 +4,14 @@ import com.silimstudy.auth.User;
 import com.silimstudy.study.request.StudyRequest;
 import com.silimstudy.study.request.StudyRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.NumberUtils;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -40,4 +42,17 @@ public class StudyController {
     public @ResponseBody List<Study> list() {
         return studyService.search();
     }
+
+    @RequestMapping(method = RequestMethod.DELETE)
+    public @ResponseBody String remove(User user, HttpServletRequest request) {
+        long studyId = NumberUtils.parseNumber(request.getParameter("studyId"), Long.class);
+
+        Study study = studyService.find(studyId);
+        if ( study != null &&  study.getAdminId() == user.getId()) {
+            studyService.remove(study);
+            return "SUCCESS";
+        }
+        return "FAIL";
+    }
+
 }
