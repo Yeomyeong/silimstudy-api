@@ -1,4 +1,4 @@
-package com.silimstudy.study;
+package com.silimstudy.study.persistence;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ public class Study {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private long adminId;
-    private List<Long> participantIds;
+//    private List<Long> participantIds;
     private String title;
     private String contents;
     private boolean isActive;

@@ -1,6 +1,7 @@
 package com.silimstudy.study;
 
 import com.silimstudy.auth.User;
+import com.silimstudy.study.persistence.Study;
 import com.silimstudy.study.request.StudyRequest;
 
 import java.util.List;

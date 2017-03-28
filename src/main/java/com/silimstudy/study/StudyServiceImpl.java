@@ -1,6 +1,8 @@
 package com.silimstudy.study;
 
 import com.silimstudy.auth.User;
+import com.silimstudy.study.persistence.Study;
+import com.silimstudy.study.persistence.StudyRepository;
 import com.silimstudy.study.request.StudyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

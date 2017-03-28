@@ -1,4 +1,4 @@
-package com.silimstudy.study;
+package com.silimstudy.study.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,3 +11,4 @@ public interface StudyRepository extends JpaRepository<Study, Long>{
     List<Study> findByAdminId(Long adminId);
 
 }
+ 
